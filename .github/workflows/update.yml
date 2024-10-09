@@ -1,0 +1,89 @@
+name: update-to-latest
+
+on:
+    # schedule:
+    #     - cron: "0 0 * * *"
+    workflow_dispatch:
+
+env:
+    SOURCE_REPO: zen-browser/desktop
+
+permissions:
+    contents: write
+    pull-requests: write
+
+jobs:
+    check-version:
+        runs-on: ubuntu-latest
+        outputs:
+            current-version: ${{ steps.version-check.outputs.current-version }}
+            latest-version: ${{ steps.version-check.outputs.latest-version }}
+            is-open-pr: ${{ steps.version-check.outputs.is-open-pr }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4.2.1
+
+            - id: version-check
+              env:
+                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "current-version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+                  LATEST_VERSION=$(gh release list --repo $SOURCE_REPO --limit 1 --exclude-pre-releases --json tagName --jq '.[0].tagName')
+                  echo "latest-version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+
+                  echo "is-open-pr=$(gh pr list --author '@me' --head $LATEST_VERSION --state open --json id --jq '. | length')" >> $GITHUB_OUTPUT
+
+    update:
+        needs: check-version
+        if: ${{ needs.check-version.outputs.current-version != needs.check-version.outputs.latest-version && needs.check-version.outputs.is-open-pr == '0' }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4.2.1
+
+            - name: Install Nix
+              uses: DeterminateSystems/nix-installer-action@main
+
+            - name: Update
+              run: |
+                # Set variables
+                NEW_VERSION=${{ needs.check-version.outputs.latest-version }}
+                
+                # Create and checkout new branch
+                git checkout -b $NEW_VERSION
+                
+                # Update VERSION file
+                echo $NEW_VERSION > VERSION
+                
+                # Update flake.nix
+                sed -i "s/version = \".*\"/version = \"$NEW_VERSION\"/" flake.nix
+                
+                # Get new SHA256 for generic and specific builds
+                GENERIC_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-generic.tar.bz2")
+                SPECIFIC_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-specific.tar.bz2")
+                
+                # Update SHA256 in flake.nix
+                sed -i "s|sha256 = \"sha256:.*\"; # generic|sha256 = \"sha256:$GENERIC_SHA\"; # generic|" flake.nix
+                sed -i "s|sha256 = \"sha256:.*\"; # specific|sha256 = \"sha256:$SPECIFIC_SHA\"; # specific|" flake.nix
+
+            - name: Build
+              run: |
+                nix flake update
+                nix build
+
+            - name: Raise PR
+              env:
+                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                # Commit changes
+                git config user.name "github-actions[bot]"
+                git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                git add VERSION flake.nix flake.lock
+                git commit -m "Update Zen Browser to version ${NEW_VERSION}"
+                
+                # Push changes
+                git push -u origin $BRANCH_NAME
+                
+                # Create pull request
+                gh pr create --title "Update Zen Browser to ${NEW_VERSION}" --body "This PR updates Zen Browser to version [${NEW_VERSION}](https://github.com/zen-browser/desktop/releases/tag/${NEW_VERSION})." --base master --head $BRANCH_NAME
