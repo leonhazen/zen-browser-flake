@@ -45,6 +45,8 @@ jobs:
             - name: Install Nix
               uses: DeterminateSystems/nix-installer-action@main
 
+            - uses: DeterminateSystems/magic-nix-cache-action@main
+
             - name: Update
               run: |
                 # Set variables
@@ -64,8 +66,8 @@ jobs:
                 SPECIFIC_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-specific.tar.bz2")
                 
                 # Update SHA256 in flake.nix
-                sed -i "s|sha256 = \"sha256:.*\"; # generic|sha256 = \"sha256:$GENERIC_SHA\"; # generic|" flake.nix
-                sed -i "s|sha256 = \"sha256:.*\"; # specific|sha256 = \"sha256:$SPECIFIC_SHA\"; # specific|" flake.nix
+                sed -i 's|sha256 = "sha256:.*"; # generic|sha256 = "sha256:'$GENERIC_SHA'"; # generic|' flake.nix
+                sed -i 's|sha256 = "sha256:.*"; # specific|sha256 = "sha256:'$SPECIFIC_SHA'"; # specific|' flake.nix
 
             - name: Build
               run: |
@@ -81,7 +83,7 @@ jobs:
                 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                 git add VERSION flake.nix flake.lock
                 git commit -m "Update Zen Browser to version ${NEW_VERSION}"
-                
+
                 # Push changes
                 git push -u origin $BRANCH_NAME
                 
