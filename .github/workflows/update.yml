@@ -88,4 +88,4 @@ jobs:
                 git push -u origin $NEW_VERSION
                 
                 # Create pull request
-                gh pr create --title "Update Zen Browser to $NEW_VERSION" --body "This PR updates Zen Browser to version [$NEW_VERSION](https://github.com/zen-browser/desktop/releases/tag/${NEW_VERSION})." --base master --head $BRANCH_NAME
+                gh pr create --title "Update Zen Browser to $NEW_VERSION" --body "This PR updates Zen Browser to version [$NEW_VERSION](https://github.com/zen-browser/desktop/releases/tag/${NEW_VERSION})." --base master --head $NEW_VERSION
