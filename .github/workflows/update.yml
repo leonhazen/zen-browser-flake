@@ -109,8 +109,8 @@ jobs:
                 gh pr create \
                       --title "chore(release): bump zen browser to ${NEW_VERSION}" \
                       --body "$(cat << 'EOF'
-                This PR updates Zen Browser to [${NEW_VERSION_NAME}](https://github.com/zen-browser/desktop/releases/tag/${NEW_VERSION}).
-                - current version: [${CURRENT_VERSION}](https://github.com/zen-browser/desktop/releases/tag/${CURRENT_VERSION}).
+                This PR updates Zen Browser to [$NEW_VERSION_NAME](https://github.com/zen-browser/desktop/releases/tag/$NEW_VERSION).
+                - current version: [$CURRENT_VERSION](https://github.com/zen-browser/desktop/releases/tag/$CURRENT_VERSION).
 
                 ## Changes
               
