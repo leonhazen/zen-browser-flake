@@ -29,22 +29,21 @@ jobs:
               env:
                 GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-              
                   # Get release flagged as latest
-                  latest==$(gh release list --repo zen-browser/desktop --limit 5 --exclude-pre-releases --json tagName,name,isLatest | jq '.[] | select(.isLatest == true)')
+                  LATEST=$(gh release list --repo $SOURCE_REPO --limit 5 --exclude-pre-releases --json tagName,name,isLatest | jq '.[] | select(.isLatest == true)')
 
                   # Pull out version info
-                  latest-version=$(echo $latest | jq -r '.tagName')
-                  latest-version-name=$(echo $latest | jq -r '.name')
-                  upgrade-branch="upgrade-to-$latest-version"
-                  open-upgrade-prs=$(gh pr list --author '@me' --head $upgrade-branch --state open --json id --jq '. | length')
+                  LATEST_VERSION=$(echo $LATEST | jq -r '.tagName')
+                  LATEST_VERSION_NAME=$(echo "$LATEST" | jq -r '.name')
+                  UPGRADE_BRANCH="upgrade-to-${LATEST_VERSION}"
+                  OPEN_UPGRADE_PRS=$(gh pr list --author '@me' --head "$UPGRADE_BRANCH" --state open --json id --jq '. | length')
                   
                   # Set outputs
                   echo "current-version=$(cat VERSION)" >> $GITHUB_OUTPUT
-                  echo "latest-version=$latest-version" >> $GITHUB_OUTPUT
-                  echo "upgrade-branch=$upgrade-branch" >> $GITHUB_OUTPUT
-                  echo "latest-version-name=$latest-version-name" >> $GITHUB_OUTPUT
-                  echo "open-upgrade-prs=$open-upgrade-prs" >> $GITHUB_OUTPUT
+                  echo "latest-version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+                  echo "upgrade-branch=$UPGRADE_BRANCH" >> $GITHUB_OUTPUT
+                  echo "latest-version-name=$LATEST_VERSION_NAME" >> $GITHUB_OUTPUT
+                  echo "open-upgrade-prs=$OPEN_UPGRADE_PRS" >> $GITHUB_OUTPUT
 
     update:
         needs: check-version
@@ -71,7 +70,7 @@ jobs:
                 git checkout -b $UPGRADE_BRANCH
                 
                 # Update VERSION file
-                echo $NEW_VERSION > VERSION
+                echo "$NEW_VERSION" > VERSION
                 
                 # Update flake.nix
                 sed -i "s/version = \".*\"/version = \"$NEW_VERSION\"/" flake.nix
@@ -101,17 +100,17 @@ jobs:
                 git config user.name "github-actions[bot]"
                 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                 git add VERSION flake.nix flake.lock
-                git commit -m "chore(release): bump zen browser to $NEW_VERSION"
+                git commit -m "chore(release): bump zen browser to ${NEW_VERSION}"
 
                 # Push changes
                 git push -u origin $UPGRADE_BRANCH
                 
                 # Create pull request
                 gh pr create \
-                      --title "chore(release): bump zen browser to $NEW_VERSION" \
+                      --title "chore(release): bump zen browser to ${NEW_VERSION}" \
                       --body "$(cat << 'EOF'
-                This PR updates Zen Browser to [$NEW_VERSION_NAME](https://github.com/zen-browser/desktop/releases/tag/${NEW_VERSION}).
-                - current version: [$CURRENT_VERSION](https://github.com/zen-browser/desktop/releases/tag/${CURRENT_VERSION}).
+                This PR updates Zen Browser to [${NEW_VERSION_NAME}](https://github.com/zen-browser/desktop/releases/tag/${NEW_VERSION}).
+                - current version: [${CURRENT_VERSION}](https://github.com/zen-browser/desktop/releases/tag/${CURRENT_VERSION}).
 
                 ## Changes
               
