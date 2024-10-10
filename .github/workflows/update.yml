@@ -116,6 +116,8 @@ jobs:
                 - current version: [${CURRENT_VERSION}](https://github.com/zen-browser/desktop/releases/tag/${CURRENT_VERSION}).
 
                 ## Changes
+                
+                Confirm these 3 changes exist in this PR before merging.
               
                 - Updated VERSION file
                 - Updated flake.nix with new version and SHA256 hashes
