@@ -123,5 +123,5 @@ jobs:
                 EOF
                 )" \
                       --base master \
-                      --head $UPGRADE_BRANCH
+                      --head $UPGRADE_BRANCH \
                       --assignee @leonhazen
