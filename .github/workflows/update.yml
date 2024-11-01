@@ -2,7 +2,7 @@ name: update-to-latest
 
 on:
     schedule:
-        - cron: "0 0 * * *"
+        - cron: "0 */2 * * *"
     workflow_dispatch:
 
 env:
@@ -13,7 +13,7 @@ permissions:
     pull-requests: write
 
 jobs:
-    check-version:
+    check-for-upgrade:
         runs-on: ubuntu-latest
         outputs:
             current-version: ${{ steps.version-check.outputs.current-version }}
@@ -49,8 +49,8 @@ jobs:
                   echo "open-upgrade-prs=$OPEN_UPGRADE_PRS" >> $GITHUB_OUTPUT
 
     update:
-        needs: check-version
-        if: ${{ needs.check-version.outputs.current-version != needs.check-version.outputs.latest-version && needs.check-version.outputs.open-upgrade-prs == '0' }}
+        needs: check-for-upgrade
+        if: ${{ needs.check-for-upgrade.outputs.current-version != needs.check-for-upgrade.outputs.latest-version && needs.check-for-upgrade.outputs.open-upgrade-prs == '0' }}
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -63,8 +63,8 @@ jobs:
 
             - name: Update
               env:
-                NEW_VERSION: ${{ needs.check-version.outputs.latest-version }}
-                UPGRADE_BRANCH: ${{ needs.check-version.outputs.upgrade-branch }}
+                NEW_VERSION: ${{ needs.check-for-upgrade.outputs.latest-version }}
+                UPGRADE_BRANCH: ${{ needs.check-for-upgrade.outputs.upgrade-branch }}
               run: |
                 # Create and checkout new branch
                 git checkout -b $UPGRADE_BRANCH
@@ -94,10 +94,10 @@ jobs:
             - name: Raise PR
               env:
                 GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                NEW_VERSION: ${{ needs.check-version.outputs.latest-version }}
-                CURRENT_VERSION: ${{ needs.check-version.outputs.current-version }}
-                NEW_VERSION_NAME: ${{ needs.check-version.outputs.latest-version-name }}
-                UPGRADE_BRANCH: ${{ needs.check-version.outputs.upgrade-branch }}
+                NEW_VERSION: ${{ needs.check-for-upgrade.outputs.latest-version }}
+                CURRENT_VERSION: ${{ needs.check-for-upgrade.outputs.current-version }}
+                NEW_VERSION_NAME: ${{ needs.check-for-upgrade.outputs.latest-version-name }}
+                UPGRADE_BRANCH: ${{ needs.check-for-upgrade.outputs.upgrade-branch }}
               run: |
                 # Commit changes
                 git config user.name "github-actions[bot]"
