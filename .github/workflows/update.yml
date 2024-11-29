@@ -116,7 +116,8 @@ jobs:
 
                 Current version in flake: [${CURRENT_VERSION}](https://github.com/zen-browser/desktop/releases/tag/${CURRENT_VERSION}).
                 
-                [Changes](https://github.com/zen-browser/desktop/compare/${CURRENT_VERSION}...${NEW_VERSION})
+                - [Changes - Github](https://github.com/zen-browser/desktop/compare/${CURRENT_VERSION}...${NEW_VERSION})
+                - [Release Notes](https://zen-browser.app/release-notes#${NEW_VERSION})
 
                 ## Changes
 
