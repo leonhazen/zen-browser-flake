@@ -13,6 +13,8 @@ inputs = {
 
 ## Packages
 
+> [!NOTE] The below is outdated. Zen no longer provides `specific` and `generic` builds. I've put in a hacky fix to point all to the one build, will update this once tested more.
+
 This flake exposes two packages, corresponding to the `specific` and `generic` zen versions.
 The generic version maximizes compatibility with old CPUs and kernels by compiling it with some
 lower common denominator CFLAGS, the `specific` one targets newer CPUs and kernels but it may not

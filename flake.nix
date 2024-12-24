@@ -12,13 +12,9 @@
     system = "x86_64-linux";
     version = "1.0.2-b.4";
     downloadUrl = {
-      "specific" = {
-        url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-aarch64.tar.bz2";
-        sha256 = "sha256:1vxz49hrlw6397k2awqffx13cm303z1r8j39rl24ahn0l7hgkgqh"; # specific
-      };
       "generic" = {
         url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-x86_64.tar.bz2";
-        sha256 = "sha256:0vqzins5g4xx6niylzjq071vyk4djpn6a7rh1ymbx83ns0xb4lb5"; # generic
+        sha256 = "sha256:0vqzins5g4xx6niylzjq071vyk4djpn6a7rh1ymbx83ns0xb4lb5";
       };
     };
 
@@ -121,8 +117,8 @@
   in {
     packages."${system}" = {
       generic = mkZen {variant = "generic";};
-      specific = mkZen {variant = "specific";};
-      default = self.packages."${system}".specific;
+      specific = self.packages."${system}".generic;
+      default = self.packages."${system}".generic;
     };
   };
 }
