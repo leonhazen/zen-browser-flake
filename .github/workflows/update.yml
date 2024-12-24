@@ -76,8 +76,8 @@ jobs:
                 sed -i "s/version = \".*\"/version = \"$NEW_VERSION\"/" flake.nix
                 
                 # Get new SHA256 for generic and specific builds
-                GENERIC_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-generic.tar.bz2")
-                SPECIFIC_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-specific.tar.bz2")
+                GENERIC_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-x86_64.tar.bz2")
+                SPECIFIC_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-aarch64.tar.bz2")
                 
                 echo "Generic SHA256: $GENERIC_SHA"
                 echo "Specific SHA256: $SPECIFIC_SHA"
