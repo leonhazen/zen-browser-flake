@@ -76,7 +76,7 @@ jobs:
                 sed -i "s/version = \".*\"/version = \"$NEW_VERSION\"/" flake.nix
                 
                 # Get new SHA256 for build
-                NEW_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-x86_64.tar.bz2")
+                NEW_SHA=$(nix-prefetch-url --type sha256 --unpack "https://github.com/zen-browser/desktop/releases/download/${NEW_VERSION}/zen.linux-x86_64.tar.xz")
 
                 # Update SHA256 in flake.nix
                 sed -i 's|sha256 = "sha256:.*";|sha256 = "sha256:'$NEW_SHA'";|' flake.nix
