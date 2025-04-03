@@ -10,11 +10,11 @@
     nixpkgs,
   }: let
     system = "x86_64-linux";
-    version = "1.10.3b";
+    version = "1.11b";
     downloadUrl = {
       "generic" = {
         url = "https://github.com/zen-browser/desktop/releases/download/${version}/zen.linux-x86_64.tar.xz";
-        sha256 = "sha256:1vrxm5m4pylzhs6bilqswis0klkq7xcriwdkfl7dyv8lq4cafz1p";
+        sha256 = "sha256:07f144nw1jbm798fikm1sc22i5vn8xz61n4hc0g9xw3b7b4m45j4";
       };
     };
 
